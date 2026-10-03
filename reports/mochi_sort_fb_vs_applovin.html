@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mochi Sort: Facebook vs AppLovin</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f6f7f9; --text: #1d2330; --muted: #5d6675;
+    --border: #e1e4ea; --accent: #2f5bd3; --good: #1f8a4c; --bad: #c0392b;
+    --good-bg: #e8f5ee; --bad-bg: #fbecea; --warn-bg: #fff6e0; --warn: #8a6100;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171c; --surface: #1c2027; --text: #e6e9ef; --muted: #9aa3b2;
+      --border: #2c323c; --accent: #7a9cff; --good: #5fd08f; --bad: #ff7b6e;
+      --good-bg: #17291f; --bad-bg: #2e1b19; --warn-bg: #2b2414; --warn: #e8c46a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171c; --surface: #1c2027; --text: #e6e9ef; --muted: #9aa3b2;
+    --border: #2c323c; --accent: #7a9cff; --good: #5fd08f; --bad: #ff7b6e;
+    --good-bg: #17291f; --bad-bg: #2e1b19; --warn-bg: #2b2414; --warn: #e8c46a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 26px; line-height: 1.25; margin: 0 0 6px; }
+  h2 { font-size: 19px; margin: 40px 0 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+  h3 { font-size: 15px; margin: 24px 0 8px; }
+  p, li { color: var(--text); }
+  .muted { color: var(--muted); font-size: 13.5px; }
+  code { font: 12.5px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--surface); padding: 1px 5px; border-radius: 4px; }
+  .scope { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin: 16px 0 8px; font-size: 14px; }
+  .scope ul { margin: 6px 0 0; padding-left: 18px; }
+  .answers { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 8px; }
+  .card { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; background: var(--surface); }
+  .card .q { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  .card .a { font-weight: 650; font-size: 16px; margin-bottom: 6px; }
+  .card p { margin: 0; font-size: 14px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; margin: 8px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { background: var(--surface); font-weight: 600; font-size: 12.5px; color: var(--muted); }
+  tr:last-child td { border-bottom: none; }
+  tr.total td { font-weight: 650; background: var(--surface); }
+  .fb { color: var(--accent); font-weight: 600; }
+  .ok { color: var(--good); font-weight: 600; }
+  .no { color: var(--bad); font-weight: 600; }
+  .hl { background: var(--good-bg); }
+  .note { background: var(--warn-bg); color: var(--text); border-left: 3px solid var(--warn); padding: 10px 14px; border-radius: 4px; font-size: 14px; margin: 12px 0; }
+  .takeaway { font-size: 14px; margin: 6px 0 0; }
+  ol li { margin-bottom: 6px; }
+  .explain { border: 1px solid var(--border); border-radius: 8px; padding-block: 4px 12px; padding-inline: 16px; margin-top: 16px; font-size: 14px; }
+  .explain h4 { font-size: 14.5px; margin: 12px 0 4px; }
+  .explain p { margin: 8px 0; max-width: 72ch; }
+  .explain ul, .explain ol { margin: 4px 0; padding-left: 20px; }
+  .formula { font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--surface); padding: 8px 12px; border-radius: 6px; overflow-x: auto; white-space: nowrap; max-width: 100% !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Facebook vs AppLovin: does one predict the other?</h1>
+  <div class="muted">Mochi Sort · installs Sep 3–30, 2026 · Day 0 and D1 metrics only</div>
+
+  <div class="scope">
+    <strong>Scope</strong>
+    <ul>
+      <li><strong>AppLovin:</strong> <code>MOCH_WW_IOS_ALL (BLD D7 CPM)</code> (iOS, Sep 22–28). The Aug 26 – Sep 3 AppLovin campaigns are excluded.</li>
+      <li><strong>Facebook:</strong> <code>MOCH_BR_ID_ADR_VID</code>, <code>MOCH_BR_ID_IOS_VID</code>, <code>MOCH_US_IOS_VID (MAI AEM D1)</code>.</li>
+      <li><strong>Sources:</strong> Snowflake <code>DIM_USERS</code> (attribution, country, install date) joined to <code>DAILY_ACTIVE_USERS</code> (Day 0 activity, D1 return) on user ID + game ID.</li>
+    </ul>
+  </div>
+
+  <h2>1. Answers</h2>
+  <div class="answers">
+    <div class="card">
+      <div class="q">Do Facebook results indicate AppLovin results?</div>
+      <div class="a no">Not for retention</div>
+      <p>In US iOS, Day 0 engagement is similar on both networks, but AppLovin's D1 is less than half of Facebook's (10.8% vs 25.3%). Using Facebook to forecast AppLovin would overstate its D1 about 2.3×.</p>
+    </div>
+    <div class="card">
+      <div class="q">In which countries?</div>
+      <div class="a">Only the US (iOS) can be tested</div>
+      <p>The two networks share no other country, so for any other country there's no evidence either way.</p>
+    </div>
+    <div class="card">
+      <div class="q">Device or game behaviour: which explains retention?</div>
+      <div class="a ok">Game behaviour</div>
+      <p>Day 0 levels won is the best predictor of D1. Device is the weakest and explains none of the network gap. Behaviour explains about 1/3 of the gap; the remaining 2/3 is the network's audience itself.</p>
+    </div>
+  </div>
+
+  <h2>2. Where the networks overlap</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Platform · country</th><th>Facebook users</th><th>AppLovin users</th><th>Comparable?</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td>iOS · US</td><td>146</td><td>686</td><td class="ok">✅ the only overlap</td></tr>
+      <tr><td>iOS · BR / ID</td><td>473 / 222</td><td>0</td><td class="no">❌</td></tr>
+      <tr><td>Android · ID / BR</td><td>1,600 / 830</td><td>0 / 1</td><td class="no">❌</td></tr>
+      <tr><td>iOS · GB / CA / JP / DE / AU</td><td>0–1</td><td>51–113 each</td><td class="no">❌</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>3. US iOS: same country, same platform</h2>
+
+  <h3>3a. By device group</h3>
+  <div class="muted">Sorted by AppLovin users.</div>
+  <div class="table-wrap"><table>
+    <thead><tr>
+      <th>Device</th><th>FB users</th><th>AL users</th><th>FB D1</th><th>AL D1</th>
+      <th>FB median levels won</th><th>AL median levels won</th><th>FB avg sessions</th><th>AL avg sessions</th><th>FB D0 ARPU</th><th>AL D0 ARPU</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>iPhone new (15–17)</td><td>61</td><td>232</td><td class="fb">23.0%</td><td>12.9%</td><td>6</td><td>6</td><td>1.67</td><td>1.23</td><td>$0.04</td><td>$1.08</td></tr>
+      <tr><td>iPad</td><td>8</td><td>224</td><td>(50%, n=8)</td><td>11.2%</td><td>8</td><td>6</td><td>1.50</td><td>1.21</td><td>$0.45</td><td>$1.47</td></tr>
+      <tr><td>iPhone mid (12–14)</td><td>66</td><td>203</td><td class="fb">22.7%</td><td>8.4%</td><td>8</td><td>6</td><td>1.44</td><td>1.23</td><td>$0.16</td><td>$1.15</td></tr>
+      <tr><td>iPhone old (XS–11)</td><td>10</td><td>27</td><td>30%</td><td>7.4%</td><td>13</td><td>6</td><td>1.60</td><td>1.52</td><td>$0.07</td><td>$0.69</td></tr>
+      <tr class="total"><td>Total</td><td>146</td><td>686</td><td>25.3%</td><td>10.8%</td><td>7</td><td>6</td><td>1.58</td><td>1.24</td><td>$0.12</td><td>$1.21</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>3b. By Day 0 levels won</h3>
+  <div class="muted">Users who played the same amount, compared directly.</div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Day 0 levels won</th><th>FB users</th><th>AL users</th><th>FB D1</th><th>AL D1</th></tr></thead>
+    <tbody>
+      <tr><td>0–2</td><td>26</td><td>155</td><td class="fb">11.5%</td><td>4.5%</td></tr>
+      <tr><td>3–5</td><td>26</td><td>142</td><td class="fb">23.1%</td><td>7.7%</td></tr>
+      <tr><td>6–10</td><td>43</td><td>185</td><td class="fb">25.6%</td><td>11.9%</td></tr>
+      <tr><td>11–20</td><td>34</td><td>158</td><td class="fb">23.5%</td><td>12.7%</td></tr>
+      <tr><td>21+</td><td>17</td><td>46</td><td class="fb">52.9%</td><td>30.4%</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>3c. By Day 0 sessions</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Day 0 sessions</th><th>FB users</th><th>AL users</th><th>FB D1</th><th>AL D1</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>99</td><td>569</td><td class="fb">18.2%</td><td>9.5%</td></tr>
+      <tr><td>2</td><td>32</td><td>86</td><td class="fb">31.3%</td><td>15.1%</td></tr>
+      <tr><td>3+</td><td>15</td><td>31</td><td class="fb">60.0%</td><td>22.6%</td></tr>
+    </tbody>
+  </table></div>
+  <p class="takeaway"><strong>Takeaway:</strong> Facebook retains about 2× better at every device group and every engagement level.</p>
+
+  <h2>4. What explains retention</h2>
+
+  <h3>4a. Predictive power for D1, all users in scope</h3>
+  <div class="muted">AUC: 0.5 = coin flip, 1.0 = perfect. Each factor's D1 rates were learned on one half of users and tested on the other half (2,122 test users).</div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Rank</th><th style="text-align:left">Factor</th><th>AUC</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td>1</td><td style="text-align:left"><strong>Day 0 levels won</strong></td><td><strong>0.77</strong></td></tr>
+      <tr><td>2</td><td style="text-align:left">Day 0 playtime</td><td>0.76</td></tr>
+      <tr><td>3</td><td style="text-align:left">Day 0 levels × sessions</td><td>0.76</td></tr>
+      <tr><td>4</td><td style="text-align:left">Day 0 sessions</td><td>0.69</td></tr>
+      <tr><td>5</td><td style="text-align:left">Country + device</td><td>0.65</td></tr>
+      <tr><td>6</td><td style="text-align:left">Country</td><td>0.64</td></tr>
+      <tr><td>7</td><td style="text-align:left">Device group</td><td>0.60</td></tr>
+      <tr><td>8</td><td style="text-align:left">Network (FB vs AL)</td><td>0.60</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">Adding country to Day 0 behaviour doesn't improve the score (0.76 → 0.76).</p>
+
+  <h3>4b. Why is AppLovin's D1 lower in US iOS? (gap: 14.5 pp)</h3>
+  <div class="muted">Facebook users were reweighted to match AppLovin's mix on each factor.</div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>If Facebook users matched AppLovin's…</th><th>FB D1 becomes</th><th>Remaining gap</th><th>Share of gap explained</th></tr></thead>
+    <tbody>
+      <tr><td>nothing (raw)</td><td>25.3%</td><td>14.5 pp</td><td>–</td></tr>
+      <tr><td>device mix</td><td>32.4%</td><td>21.6 pp</td><td class="no">none</td></tr>
+      <tr><td>Day 0 levels won</td><td>23.3%</td><td>12.5 pp</td><td>14%</td></tr>
+      <tr><td>Day 0 sessions</td><td>22.0%</td><td>11.2 pp</td><td>23%</td></tr>
+      <tr class="hl"><td><strong>Day 0 levels + sessions</strong></td><td><strong>20.5%</strong></td><td><strong>9.7 pp</strong></td><td class="ok">33%</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="explain">
+    <h4>How to read this table</h4>
+    <p>In US iOS:</p>
+    <ul>
+      <li>Facebook D1 = 25.3%</li>
+      <li>AppLovin D1 = 10.8%</li>
+      <li>Gap = 14.5 points</li>
+    </ul>
+    <p>There are two possible explanations:</p>
+    <ol>
+      <li><strong>AppLovin brought different kinds of users</strong>, for example users who play less on Day 0 or use different devices. Then the gap is about user mix.</li>
+      <li><strong>AppLovin's users retain worse even when they look the same</strong>, which points to the network's audience itself.</li>
+    </ol>
+    <p><strong>How the table separates them (reweighting)</strong></p>
+    <p>Take Day 0 levels won as the example. Each network's users split into groups by how many levels they won:</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Levels won</th><th>Facebook D1 for this group</th><th>Share of AppLovin users in this group</th></tr></thead>
+      <tbody>
+        <tr><td>0–2</td><td>11.5%</td><td>23% (155 of 686)</td></tr>
+        <tr><td>3–5</td><td>23.1%</td><td>21%</td></tr>
+        <tr><td>6–10</td><td>25.6%</td><td>27%</td></tr>
+        <tr><td>11–20</td><td>23.5%</td><td>23%</td></tr>
+        <tr><td>21+</td><td>52.9%</td><td>7%</td></tr>
+      </tbody>
+    </table></div>
+    <p>AppLovin has many more low-play users. 23% of its users won 0–2 levels, compared with 18% of Facebook's.</p>
+    <p>The question: what would Facebook's D1 be if its users were split across these groups the way AppLovin's are? Each Facebook group's D1 is multiplied by AppLovin's share for that group, and the results are added up:</p>
+    <p class="formula">11.5%×23% + 23.1%×21% + 25.6%×27% + 23.5%×23% + 52.9%×7% ≈ <strong>23.3%</strong></p>
+    <p>So if Facebook had AppLovin's mix of light and heavy players, its D1 would drop from 25.3% to 23.3%. <strong>Only 2 of the 14.5 points (14%) come from AppLovin users playing less.</strong> The other 12.5 points remain even when you compare users who played the same amount.</p>
+    <p><strong>Bottom line</strong></p>
+    <ul>
+      <li><strong>About 1/3 of the gap</strong> comes from AppLovin bringing users who play less on Day 0.</li>
+      <li><strong>About 2/3 of the gap</strong> remains even for users with the same Day 0 behaviour and devices. AppLovin's users are simply less likely to come back. Possible causes are the audience itself, the bidding goal (D7 ROAS vs D1 events), the different weeks, or the suspicious zero-play users.</li>
+    </ul>
+  </div>
+
+  <h2>5. Caveats</h2>
+  <div class="note"><strong>Suspicious AppLovin users:</strong> 155 of 686 (23%) won 0–2 levels with a median Day 0 playtime of about 2 seconds, but average <strong>$1.65 Day 0 revenue</strong>. That could be ad fraud, misattributed revenue, or ads shown before gameplay, and it needs checking. Without them, AppLovin's D1 is only about 12.6%.</div>
+  <ol>
+    <li><strong>Not a clean test:</strong> the campaigns ran in different weeks (AL Sep 22–28, FB Sep 28–30) and optimized for different goals (AL for D7 ROAS, FB for D1 app events).</li>
+    <li><strong>Small samples:</strong> Facebook US has only 146 users, and the iPad and older-iPhone Facebook groups (8–10 users) are too small to read.</li>
+    <li><strong>Device groups</strong> are a hand-built mapping from <code>DEVICE_MODEL</code>, not an official tiering. Users with no recorded device model are excluded from the factor ranking (4a).</li>
+  </ol>
+
+  <h2>6. Next steps</h2>
+  <ol>
+    <li><strong>Run a matched test:</strong> Facebook and AppLovin in one or two shared countries (for example GB or DE), in the same week, with the same creatives.</li>
+    <li><strong>Use Day 0 levels won (11+) as the early quality read</strong> for both networks.</li>
+    <li><strong>Investigate the zero-play, high-revenue AppLovin users</strong> before trusting AppLovin's revenue numbers.</li>
+  </ol>
+</main>
+</body>
+</html>
